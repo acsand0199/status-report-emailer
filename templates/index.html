@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Status Report Emailer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <!-- Include CKEditor Full CDN for additional features like text color -->
+    <script src="https://cdn.ckeditor.com/4.16.0/full/ckeditor.js"></script>
+    <script>
+        // Function to save data to localStorage
+        function saveData() {
+            localStorage.setItem('last_week_tasks', CKEDITOR.instances.last_week_tasks.getData());
+            localStorage.setItem('this_week_tasks', CKEDITOR.instances.this_week_tasks.getData());
+            localStorage.setItem('subject', document.getElementById('subject').value);
+            localStorage.setItem('recipients', document.getElementById('recipients').value);
+            localStorage.setItem('sender_name', document.getElementById('sender_name').value);
+        }
+
+        // Function to load data from localStorage
+        function loadData() {
+            document.getElementById('subject').value = localStorage.getItem('subject') || '';
+            document.getElementById('recipients').value = localStorage.getItem('recipients') || '';
+            document.getElementById('sender_name').value = localStorage.getItem('sender_name') || '';
+            CKEDITOR.instances.last_week_tasks.setData(localStorage.getItem('last_week_tasks') || '');
+            CKEDITOR.instances.this_week_tasks.setData(localStorage.getItem('this_week_tasks') || '');
+        }
+
+        // Event to load data when the window is loaded
+        window.onload = function() {
+            // Replace textareas with CKEditor instances
+            CKEDITOR.replace('last_week_tasks', { extraPlugins: 'colorbutton' });
+            CKEDITOR.replace('this_week_tasks', { extraPlugins: 'colorbutton' });
+            loadData();
+        };
+
+        // Event to save data when the window is unloaded
+        window.onbeforeunload = saveData;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Status Report Emailer</h2>
+        <form action="/send_status_email" method="post" onsubmit="saveData()">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" required><br>
+
+            <label for="recipients">Recipients:</label>
+            <input type="text" id="recipients" name="recipients" required><br>
+
+            <label for="sender_name">Sender's Name:</label>
+            <input type="text" id="sender_name" name="sender_name" required><br>
+
+            <label for="last_week_tasks">Last Week's Tasks:</label>
+            <textarea id="last_week_tasks" name="last_week_tasks" rows="6"></textarea><br>
+
+            <label for="this_week_tasks">This Week's Tasks:</label>
+            <textarea id="this_week_tasks" name="this_week_tasks" rows="6"></textarea><br>
+
+            <input type="submit" value="Send Status Email">
+        </form>
+    </div>
+</body>
+</html>
